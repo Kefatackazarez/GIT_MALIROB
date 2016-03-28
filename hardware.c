@@ -3,6 +3,7 @@
  *
  * Created: 4/19/2011 2:38:26 PM
  *  Author: Milan Romic *  Author: robert kovacs */
+
 #include "Headers/avr_compiler.h"
 #include "Headers/usart_driver.h"
 #include "Headers/TC_driver.h"
@@ -16,7 +17,7 @@
 void Podesi_Parametre_Robota(void)
 {
 	//mehanicke karakteristike
-	metar = 38250*2; //75000; //broj inkremenata za 1m - eksperiment!      /39035*2 izracunata vrednost
+	metar = 38415*2; //75000; //broj inkremenata za 1m - eksperiment!      /39035*2 izracunata vrednost
 	krug360 = 13925; //49650 - eksperiment 1;  //66250 - matematika;	//broj inkremenata za jedan krug - eksperiment!		//13653
 	
 	scale_factor_for_mm = metar / 1000;
@@ -25,7 +26,7 @@ void Podesi_Parametre_Robota(void)
 	krug45 =  krug360 >> 3;			
 
 	smer_zadati = 1;						//1-napred, 2-nazad, 0-sam bira smer
-	zeljena_pravolinijska_brzina = 400;		//brzina kojom se pravo krece robot
+	zeljena_pravolinijska_brzina = 450;		//brzina kojom se pravo krece robot
 	zeljena_brzina_okretanja = 300; //brzina kojom se okrece robot
 	max_brzina_motora = 800;				//eksperimentalno utvrdjena max brzina motora [impuls/vreme_odabiranja(3ms)] (max je oko 1000)
 	
@@ -38,24 +39,24 @@ void Podesi_PID_Pojacanja(void)
 {
 	//PID parametri
 	//Regulacija pravolinijskog kretanja
-	Kp_pravolinijski = 6;		//1.89625
-	Ki_pravolinijski = 1.3;
-	Kd_pravolinijski = 125;		//6
-	Kp_teta_pravolinijski = 15;	
+	Kp_pravolinijski = 5;			//6		2.5
+	Ki_pravolinijski = 0;			//1.6	3
+	Kd_pravolinijski = 330;		//30		60
+	Kp_teta_pravolinijski = 20;
 		
 	//Regulacija ugaonog zakretanja
 	Kp_teta = 20;
 	Ki_teta = 1.2;
 	Kd_teta = 20;
-	Kp_teta_okretanje = 1.5;
+	Kp_teta_okretanje = 20;
 		
 	//Regulacija brzine
-	Kp_brzina = 0.2;	//0.4
+	Kp_brzina = 0.3;
 	Ki_brzina = 0;
 	Kd_brzina = 0;
 
 	//Ubrzavanje po rampi
-	Accel_PID_pos = 2;	//bilo 2
+	Accel_PID_pos = 1;	//bilo 2
 }
 
 void Podesi_QDEC(void)
@@ -216,7 +217,6 @@ void Podesi_USART_Komunikaciju(void)
 	USART_RxdInterruptLevel_Set(USART_C0_data.usart, USART_RXCINTLVL_LO_gc);
 	//Podesavanje Baud rate
 	USART_Baudrate_Set(&USARTC0, 107, -5 );	//115200
-	//USART_Baudrate_Set(&USARTC0, 14, -2 );	//115200
 	//Ukljucivanje RX i TX
 	USART_Rx_Enable(USART_C0_data.usart);
 	USART_Tx_Enable(USART_C0_data.usart);
@@ -237,7 +237,7 @@ void Podesi_Tajmere(void)
 	
 	//System tajmer za uzorkovanje enkodera i PID regulaciju
 	/* Set period ( TOP value ). */
-	TC_SetPeriod( &TCE1, 0x005F ); //0x00BF = 12ms //0x5F = 6ms //0x2F = 3ms <- Mirko //Nasa -> //0x5DC0
+	TC_SetPeriod( &TCE1, 0x002F ); //0x00BF = 12ms //0x5F = 6ms //0x2F = 3ms <- Mirko //Nasa -> //0x5DC0
 	/* Enable overflow interrupt at low level */
 	TC1_SetOverflowIntLevel( &TCE1, TC_OVFINTLVL_MED_gc );
 	/* Start Timer/Counter. */

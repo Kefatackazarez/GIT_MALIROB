@@ -228,7 +228,7 @@ void Racunanje_trenutne_pozicije(void)
 		teta -= krug360;
 	
 	//ako predje u negativan smer
-	if(teta < 0)
+	if(teta <= 0)
 		teta += krug360;	
 	
 	//racunanje pozicije
@@ -302,7 +302,7 @@ void Pracenje_pravca(void)
 		if(teta_cilj < 0)
 			teta_cilj += krug360;
 	}
-	else if (vreme_pozicioniranja >= 300)	//stigli smo do cilja
+	else if (vreme_pozicioniranja >= 600)	//stigli smo do cilja		/bilo 300
 	{
 		if (stigao_flag == 0)
 		{
@@ -382,7 +382,7 @@ void PID_ugaoni(void)
 	teta_greska_prethodno = teta_greska; //D dejstvo
 	
 	//korigovanje greske, da bi se roobot uvek okretao u blizem smeru
-	if(teta_greska < -krug180)
+	if(teta_greska <= -krug180)
 		teta_greska += krug360;
 	else if(teta_greska > krug180)
 		teta_greska -= krug360;
@@ -485,13 +485,13 @@ void PID_brzinski(void)
 		PID_ukupni_R = -PWM_perioda;
 		
 	//levi motor
-	if (PID_ukupni_L > 3)/*if (PID_ukupni_L > 5)*/	//smer 1
+	if (PID_ukupni_L > 10)/*if (PID_ukupni_L > 5)*/	//smer 1
 	{
 		PORT_ClearPins(&PORTH, 0b00010000);	//IN_A2=0
 		PORT_SetPins(&PORTH, 0b10000000);	//IN_B2=1
 		TCF1.CCBBUF = PID_ukupni_L;
 	}
-	else if (PID_ukupni_L < -3)	//smer 2
+	else if (PID_ukupni_L < -10)	//smer 2
 	{
 		PORT_ClearPins(&PORTH, 0b10000000);	//IN_B2=0
 		PORT_SetPins(&PORTH, 0b00010000);	//IN_A2=1,
@@ -500,13 +500,13 @@ void PID_brzinski(void)
 	else	//kocenje
 		PORT_ClearPins(&PORTH, 0b10010000);	//IN_A2=0, IN_B2=0	
 	//desni motor
-	if (PID_ukupni_R > 3) //smer 1
+	if (PID_ukupni_R > 10) //smer 1
 	{
 		PORT_ClearPins(&PORTH, 0b00001000);	//IN_B1=0
 		PORT_SetPins(&PORTH, 0b00000001);	//IN_A1=1
 		TCF1.CCABUF = PID_ukupni_R;
 	}
-	else if (PID_ukupni_R < -3)	//smer 2
+	else if (PID_ukupni_R < -10)	//smer 2
 	{
 		PORT_ClearPins(&PORTH, 0b00000001);	//IN_A1=0
 		PORT_SetPins(&PORTH, 0b00001000);	//IN_B1=1
@@ -517,21 +517,15 @@ void PID_brzinski(void)
 		
 }
 
-void CheckInputMotorControl(void) // direktno zaustavljanje motora preko OPUSTANJE registra
-{
-	//stop na prekidac
+int PGM_Mode(){
 	if((PORTB.IN & 0b00000001) == 0)
-	{
-		sendChar('S');
-		set_direct_out = 1;
-		PID_brzina_L = 0;
-		PID_brzina_R = 0;
-		//USART_TXBuffer_PutByte(&USART_E1_data, 0xBB);
-	}	
-	else
-	{
-		sendChar('T');		
+	{//Pritisnut taster
+		return 1;
+	}
+	else{
 		set_direct_out = 0;
-	}	
+		return 0;
+	}
 }
+
 

@@ -45,3 +45,16 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Folderi nepotrebni za uplodovanje koda
+#   ujedno izbrisani radi preglednosti
+.atsuo
+.o
+.d
+.eep
+.srec
+.map
+.lss
+.hex
+.elf
+
